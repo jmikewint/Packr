@@ -1,0 +1,13 @@
+# Dependencies (per-service, e.g. auth-service/node_modules, catalog-service/node_modules)
+node_modules/
+
+# Environment files (per-service secrets, e.g. catalog-service/.env)
+.env
+.env.*
+!.env.example
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+
+CLAUDE.md

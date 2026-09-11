@@ -1,0 +1,40 @@
+// Catalog Service data model
+// Focused purely on catalog data - no auth/user concepts live here.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rarity {
+  COMMON
+  UNCOMMON
+  RARE
+  ULTRA_RARE
+  SECRET_RARE
+}
+
+enum Condition {
+  MINT
+  NEAR_MINT
+  LIGHTLY_PLAYED
+  DAMAGED
+}
+
+model Card {
+  id        String    @id @default(uuid())
+  name      String
+  set       String
+  rarity    Rarity
+  condition Condition
+  price     Decimal   @db.Decimal(10, 2)
+  imageUrl  String?
+  createdAt DateTime  @default(now())
+
+  @@index([set])
+  @@index([rarity])
+}
