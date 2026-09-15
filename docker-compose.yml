@@ -1,0 +1,48 @@
+services:
+  catalog-service:
+    build: ./catalog-service
+    env_file:
+      - ./catalog-service/.env # DATABASE_URL - points at the real cloud Neon db; Compose runs no Postgres of its own
+    environment:
+      FRONTEND_ORIGIN: http://localhost:3000
+    ports:
+      - "4001:4001" # published for local debugging/curl; frontend reaches this the same way, from the browser
+
+  auth-service:
+    build: ./auth-service
+    env_file:
+      - ./auth-service/.env # DATABASE_URL, JWT_SECRET, JWT_EXPIRES_IN - its own separate Neon db
+    environment:
+      FRONTEND_ORIGIN: http://localhost:3000
+    ports:
+      - "4002:4002"
+
+  pricing-service:
+    build: ./pricing-service
+    env_file:
+      - ./pricing-service/.env # ANTHROPIC_API_KEY
+    environment:
+      FRONTEND_ORIGIN: http://localhost:3000
+    ports:
+      - "4003:4003"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # NEXT_PUBLIC_* values are inlined into the browser bundle at build
+        # time. They're fetched by the *browser* (not container-to-container),
+        # so they must be host-reachable URLs - the same localhost ports
+        # published above - never the internal Docker service names
+        # (http://catalog-service:4001 etc.), which only resolve between
+        # containers on the Compose network and are meaningless to a browser
+        # running on the host.
+        NEXT_PUBLIC_CATALOG_URL: http://localhost:4001
+        NEXT_PUBLIC_AUTH_URL: http://localhost:4002
+        NEXT_PUBLIC_PRICING_URL: http://localhost:4003
+    ports:
+      - "3000:3000"
+    depends_on:
+      - catalog-service
+      - auth-service
+      - pricing-service
