@@ -1,6 +1,12 @@
 # Dependencies (per-service, e.g. auth-service/node_modules, catalog-service/node_modules)
 node_modules/
 
+# Python (per-service, e.g. pricing-service/venv)
+venv/
+.venv/
+__pycache__/
+*.pyc
+
 # Environment files (per-service secrets, e.g. catalog-service/.env)
 .env
 .env.*
