@@ -6,6 +6,7 @@ load_dotenv()
 
 import anthropic
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from pydantic import ValidationError
@@ -19,6 +20,11 @@ if missing:
     raise RuntimeError(f"Missing required environment variable(s): {', '.join(missing)}")
 
 app = Flask(__name__)
+
+# The frontend calls this service directly from the browser (not server-side),
+# so it needs CORS enabled - default to the frontend's local dev origin.
+FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://localhost:3000")
+CORS(app, origins=[FRONTEND_ORIGIN])
 
 # This is the one Packr service that spends real money per call (each
 # /estimate hit is a Claude API call), so the ceiling on it is deliberately
